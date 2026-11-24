@@ -1,0 +1,234 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Timetable Image-to-Form</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f4f6;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+        }
+
+        h2, h3 {
+            color: #243b64;
+        }
+
+        button {
+            background: #243b64;
+            color: white;
+            padding: 12px 22px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background: #36558a;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background: #243b64;
+            color: white;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 7px;
+            box-sizing: border-box;
+        }
+
+        .success {
+            background: #e8f5e9;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+
+        .error {
+            color: #b00020;
+            background: #ffebee;
+            padding: 10px;
+            margin-top: 8px;
+            border-radius: 5px;
+        }
+
+        .upload-section {
+            margin-bottom: 25px;
+        }
+
+        ul.errorlist {
+            color: #b00020;
+            padding-left: 18px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Timetable Image-to-Form</h2>
+
+    <p>Upload your college timetable image.</p>
+
+    {% if success_message %}
+        <div class="success">
+            <h3>Success!</h3>
+            {{ success_message }}
+        </div>
+    {% endif %}
+
+    <div class="upload-section">
+
+        <form method="POST"
+              action="{% url 'upload_timetable' %}"
+              enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            {{ form.as_p }}
+
+            <button type="submit">
+                Extract Timetable
+            </button>
+
+        </form>
+
+    </div>
+
+    {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+    {% endif %}
+
+    {% if entry_formset %}
+
+        <div class="success">
+            <h3>Timetable Extracted Successfully!</h3>
+
+            <p>
+                Review and edit the extracted details below.
+                Records will be saved only after clicking
+                Save Timetable.
+            </p>
+        </div>
+
+        <form method="POST"
+              action="{% url 'save_timetable' %}">
+
+            {% csrf_token %}
+
+            {{ entry_formset.management_form }}
+
+            {% if entry_formset.non_form_errors %}
+                <div class="error">
+                    {{ entry_formset.non_form_errors }}
+                </div>
+            {% endif %}
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Course & Subject</th>
+                        <th>Teacher</th>
+                        <th>Day</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Room</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for entry_form in entry_formset %}
+
+                        <tr>
+
+                            {% for hidden in entry_form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+
+                            <td>
+                                {{ entry_form.course_subject }}
+                                {{ entry_form.course_subject.errors }}
+                            </td>
+
+                            <td>
+                                {{ entry_form.employee }}
+                                {{ entry_form.employee.errors }}
+                            </td>
+
+                            <td>
+                                {{ entry_form.day }}
+                                {{ entry_form.day.errors }}
+                            </td>
+
+                            <td>
+                                {{ entry_form.start_time }}
+                                {{ entry_form.start_time.errors }}
+                            </td>
+
+                            <td>
+                                {{ entry_form.end_time }}
+                                {{ entry_form.end_time.errors }}
+                            </td>
+
+                            <td>
+                                {{ entry_form.room_number }}
+                                {{ entry_form.room_number.errors }}
+                            </td>
+
+                        </tr>
+
+                        {% if entry_form.non_field_errors %}
+                            <tr>
+                                <td colspan="6">
+                                    <div class="error">
+                                        {{ entry_form.non_field_errors }}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endif %}
+
+                    {% endfor %}
+
+                </tbody>
+            </table>
+
+            <button type="submit">
+                Save Timetable
+            </button>
+
+        </form>
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>

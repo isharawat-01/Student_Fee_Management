@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Attendance Image-to-Form</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f4f6;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+        }
+
+        h2, h3 {
+            color: #243b64;
+        }
+
+        button {
+            background: #243b64;
+            color: white;
+            padding: 12px 22px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background: #243b64;
+            color: white;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 7px;
+            box-sizing: border-box;
+        }
+
+        .success {
+            background: #e8f5e9;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+
+        .error {
+            color: red;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Attendance Register Image-to-Form</h2>
+
+    <p>Upload a clear image of your college attendance register.</p>
+
+    {% if success_message %}
+        <div class="success">
+            <h3>Success!</h3>
+            {{ success_message }}
+        </div>
+    {% endif %}
+
+    <form method="POST"
+          action="{% url 'upload_attendance' %}"
+          enctype="multipart/form-data">
+
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <button type="submit">Extract Attendance</button>
+
+    </form>
+
+    {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+    {% endif %}
+
+    {% if entry_formset %}
+
+        <div class="success">
+            <h3>Attendance Extracted Successfully!</h3>
+            <p>
+                Verify student names, dates and attendance status
+                before saving.
+            </p>
+        </div>
+
+        <form method="POST" action="{% url 'save_attendance' %}">
+
+            {% csrf_token %}
+
+            {{ entry_formset.management_form }}
+
+            {% if entry_formset.non_form_errors %}
+                <div class="error">
+                    {{ entry_formset.non_form_errors }}
+                </div>
+            {% endif %}
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for entry_form in entry_formset %}
+
+                        <tr>
+                            {% for hidden in entry_form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+
+                            <td>
+                                {{ entry_form.student }}
+                                {{ entry_form.student.errors }}
+                            </td>
+
+                            <td>
+                                {{ entry_form.date }}
+                                {{ entry_form.date.errors }}
+                            </td>
+
+                            <td>
+                                {{ entry_form.status }}
+                                {{ entry_form.status.errors }}
+                            </td>
+
+                            <td>
+                                {{ entry_form.remarks }}
+                                {{ entry_form.remarks.errors }}
+                            </td>
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+            </table>
+
+            <button type="submit">Save Attendance</button>
+
+        </form>
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>

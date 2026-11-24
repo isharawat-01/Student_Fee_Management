@@ -40,6 +40,12 @@ INSTALLED_APPS = [
     # Custom Applications
     'students',
     'fees',
+    'courses',
+    'subjects',
+    'employees',
+    'attendance',
+    'timetable',
+    'ai_assistant',
 ]
 
 MIDDLEWARE = [
@@ -119,3 +125,6 @@ STATIC_URL = 'static/'
 # Default primary key field type
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Login URL
+LOGIN_URL = '/admin/login/'

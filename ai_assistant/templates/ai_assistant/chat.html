@@ -1,0 +1,170 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College AI Assistant</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f4f6;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #243b64;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 12px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 15px;
+            resize: vertical;
+        }
+
+        button {
+            margin-top: 12px;
+            padding: 12px 25px;
+            background: #243b64;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #36578d;
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 18px;
+            background: #f0f7ff;
+            border-radius: 8px;
+        }
+
+        .error {
+            margin-top: 20px;
+            padding: 12px;
+            background: #ffe5e5;
+            color: #b00020;
+            border-radius: 8px;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background: #243b64;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>College AI Assistant</h1>
+
+    <p class="subtitle">
+        Ask questions about your college database
+    </p>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <textarea
+            name="question"
+            placeholder="Example: Show all courses"
+            required
+        ></textarea>
+
+        <button type="submit">Ask AI</button>
+    </form>
+
+    {% if generated_sql %}
+        <div class="result">
+            <h3>Generated SQL</h3>
+            <pre>{{ generated_sql }}</pre>
+        </div>
+    {% endif %}
+
+    {% if answer %}
+        <div class="result">
+            <h3>AI Result</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        {% for column in answer.columns %}
+                            <th>{{ column }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for row in answer.rows %}
+                        <tr>
+                            {% for value in row %}
+                                <td>{{ value }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="{{ answer.columns|length }}">
+                                No records found.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+    {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+    {% endif %}
+
+</div>
+
+</body>
+</html>
