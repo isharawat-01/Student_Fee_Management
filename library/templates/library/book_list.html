@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Library Management</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        h1 {
+            color: #243b55;
+        }
+
+        .buttons {
+            margin: 20px 0;
+        }
+
+        a {
+            text-decoration: none;
+            background: #243b55;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-right: 8px;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .search-form input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .search-form button {
+            background: #198754;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .clear-btn {
+            background: #6c757d;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #243b55;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f2f2f2;
+        }
+
+        .messages {
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Library Management System</h1>
+    <p>Manage books and student book issues.</p>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p class="messages">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <div class="buttons">
+        <a href="{% url 'issue_book' %}">Issue Book</a>
+        <a href="{% url 'issued_books' %}">Issued Books</a>
+        <a href="{% url 'library_dashboard' %}">Dashboard</a>
+        <a href="/admin/">Admin Panel</a>
+    </div>
+
+    <h2>Search Books</h2>
+
+    <form method="GET" class="search-form">
+
+        <input
+            type="text"
+            name="search"
+            placeholder="Search by title, author or ISBN..."
+            value="{{ search_query }}"
+        >
+
+        <button type="submit">Search</button>
+
+        <a href="{% url 'book_list' %}" class="clear-btn">
+            Clear
+        </a>
+
+    </form>
+
+    <h2>Available Books</h2>
+
+    <table>
+        <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>ISBN</th>
+            <th>Category</th>
+            <th>Total Copies</th>
+            <th>Available Copies</th>
+        </tr>
+
+        {% for book in books %}
+        <tr>
+            <td>{{ book.title }}</td>
+            <td>{{ book.author }}</td>
+            <td>{{ book.isbn }}</td>
+            <td>{{ book.category.name }}</td>
+            <td>{{ book.total_copies }}</td>
+            <td>{{ book.available_copies }}</td>
+        </tr>
+
+        {% empty %}
+        <tr>
+            <td colspan="6">No matching books found.</td>
+        </tr>
+        {% endfor %}
+
+    </table>
+
+</div>
+
+</body>
+</html>

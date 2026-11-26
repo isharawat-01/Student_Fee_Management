@@ -1,0 +1,207 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Issued Books</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        h1 {
+            color: #243b55;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #243b55;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f2f2f2;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .return-btn {
+            background: #198754;
+            color: white;
+            padding: 7px 12px;
+            border-radius: 5px;
+        }
+
+        .pay-btn {
+            background: #0d6efd;
+            color: white;
+            padding: 7px 12px;
+            border-radius: 5px;
+        }
+
+        .returned {
+            color: green;
+            font-weight: bold;
+        }
+
+        .issued {
+            color: #c0392b;
+            font-weight: bold;
+        }
+
+        .overdue {
+            color: red;
+            font-weight: bold;
+        }
+
+        .fine {
+            color: #c0392b;
+            font-weight: bold;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 20px;
+            color: #243b55;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Issued Books</h1>
+
+    <p>Track issued, returned, overdue books and fine payments.</p>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <table>
+
+        <tr>
+            <th>Student</th>
+            <th>Book</th>
+            <th>Issue Date</th>
+            <th>Due Date</th>
+            <th>Return Date</th>
+            <th>Fine (₹)</th>
+            <th>Pending Fine (₹)</th>
+            <th>Payment Status</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+
+        {% for issue in issues %}
+
+        <tr>
+
+            <td>{{ issue.student.student_id }}</td>
+
+            <td>{{ issue.book.title }}</td>
+
+            <td>{{ issue.issue_date }}</td>
+
+            <td>{{ issue.due_date }}</td>
+
+            <td>{{ issue.return_date|default:"-" }}</td>
+
+            <td>₹{{ issue.fine }}</td>
+
+            <td class="fine">
+                ₹{{ issue.pending_fine }}
+            </td>
+
+            <td>
+                {{ issue.payment_status }}
+            </td>
+
+            <td>
+
+                {% if issue.status == "Returned" %}
+
+                    <span class="returned">Returned</span>
+
+                {% elif issue.is_overdue %}
+
+                    <span class="overdue">Overdue</span>
+
+                {% else %}
+
+                    <span class="issued">Issued</span>
+
+                {% endif %}
+
+            </td>
+
+            <td>
+
+                {% if issue.status == "Issued" %}
+
+                    <a class="return-btn"
+                       href="{% url 'return_book' issue.id %}">
+                        Return
+                    </a>
+
+                {% elif issue.pending_fine > 0 %}
+
+                    <a class="pay-btn"
+                       href="{% url 'pay_fine' issue.id %}">
+                        Pay Fine
+                    </a>
+
+                {% else %}
+
+                    -
+
+                {% endif %}
+
+            </td>
+
+        </tr>
+
+        {% empty %}
+
+        <tr>
+            <td colspan="10">No books have been issued yet.</td>
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+    <a class="back" href="{% url 'library_dashboard' %}">
+        ← Back to Dashboard
+    </a>
+
+</div>
+
+</body>
+</html>

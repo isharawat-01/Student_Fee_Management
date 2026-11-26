@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'attendance',
     'timetable',
     'ai_assistant',
+    'library',
 ]
 
 MIDDLEWARE = [

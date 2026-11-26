@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Return Book</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 60px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #243b55;
+        }
+
+        .details {
+            background: #f4f6f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        button {
+            background: #198754;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            color: #243b55;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Return Book</h1>
+
+    <p>Are you sure you want to return this book?</p>
+
+    <div class="details">
+        <p><strong>Student:</strong> {{ issue.student.student_id }}</p>
+        <p><strong>Book:</strong> {{ issue.book.title }}</p>
+        <p><strong>Issue Date:</strong> {{ issue.issue_date }}</p>
+        <p><strong>Due Date:</strong> {{ issue.due_date }}</p>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit">Confirm Return</button>
+    </form>
+
+    <a href="{% url 'issued_books' %}">Cancel</a>
+
+</div>
+
+</body>
+</html>

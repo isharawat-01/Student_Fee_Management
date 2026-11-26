@@ -1,0 +1,161 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pay Fine</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 550px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #243b55;
+        }
+
+        .details {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 7px;
+            margin: 20px 0;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 7px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background: #198754;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 15px;
+            color: #243b55;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Fine Payment</h1>
+
+    <div class="details">
+
+        <p>
+            <strong>Student:</strong>
+            {{ issue.student.student_id }}
+        </p>
+
+        <p>
+            <strong>Book:</strong>
+            {{ issue.book.title }}
+        </p>
+
+        <p>
+            <strong>Total Fine:</strong>
+            ₹{{ issue.fine }}
+        </p>
+
+        <p>
+            <strong>Already Paid:</strong>
+            ₹{{ issue.paid_fine }}
+        </p>
+
+        <p>
+            <strong>Pending Fine:</strong>
+            ₹{{ pending_fine }}
+        </p>
+
+        <p>
+            <strong>Payment Status:</strong>
+            {{ issue.payment_status }}
+        </p>
+
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p class="error">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    {% if pending_fine > 0 %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <label>Payment Amount (₹)</label>
+
+            <input
+                type="number"
+                name="paid_fine"
+                min="0.01"
+                max="{{ pending_fine }}"
+                step="0.01"
+                required
+            >
+
+            <label>Payment Date</label>
+
+            <input
+                type="date"
+                name="payment_date"
+                required
+            >
+
+            <button type="submit">
+                Submit Payment
+            </button>
+
+        </form>
+
+    {% else %}
+
+        <p style="color:green;">
+            No pending fine. Payment is complete!
+        </p>
+
+    {% endif %}
+
+    <a class="back" href="{% url 'issued_books' %}">
+        ← Back to Issued Books
+    </a>
+
+</div>
+
+</body>
+</html>
