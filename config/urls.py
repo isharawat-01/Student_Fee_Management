@@ -7,4 +7,6 @@ urlpatterns = [
     path('ai/', include('ai_assistant.urls')),
 
     path('library/', include('library.urls')),
+
+    path('dashboard/', include('dashboard.urls')),
 ]

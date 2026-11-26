@@ -1,0 +1,521 @@
+
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Dashboard | College Management System{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-heading {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .page-subtitle {
+        color: #7b879c;
+        margin-bottom: 25px;
+        font-size: 14px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 14px;
+        padding: 22px;
+        height: 100%;
+        box-shadow: 0 3px 18px rgba(25, 42, 75, .05);
+    }
+
+    .stat-title {
+        color: #7b879c;
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+
+    .stat-value {
+        font-size: 26px;
+        font-weight: 700;
+        color: #26334d;
+    }
+
+    .stat-icon {
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        font-size: 21px;
+    }
+
+    .icon-blue { background: #e8efff; color: #3157d5; }
+    .icon-green { background: #e4f7ed; color: #1d9b5c; }
+    .icon-orange { background: #fff0df; color: #e58b25; }
+    .icon-purple { background: #f0e9ff; color: #8053cf; }
+    .icon-red { background: #ffe9e9; color: #d9534f; }
+
+    .panel {
+        background: white;
+        border-radius: 14px;
+        padding: 22px;
+        box-shadow: 0 3px 18px rgba(25, 42, 75, .05);
+        height: 100%;
+    }
+
+    .panel-title {
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 280px;
+    }
+
+    .filter-form {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .filter-form select,
+    .filter-form input {
+        border: 1px solid #dce2ed;
+        border-radius: 7px;
+        padding: 7px 10px;
+        font-size: 13px;
+    }
+
+    .table {
+        font-size: 13px;
+        vertical-align: middle;
+    }
+
+    .table thead th {
+        color: #7b879c;
+        font-weight: 600;
+        background: #f8f9fc;
+        white-space: nowrap;
+    }
+
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .status-present { background: #e4f7ed; color: #1d9b5c; }
+    .status-absent { background: #ffe9e9; color: #d9534f; }
+    .status-late { background: #fff0df; color: #d98220; }
+
+    .empty-message {
+        text-align: center;
+        padding: 25px;
+        color: #8994a7;
+    }
+
+    @media(max-width: 576px) {
+        .page-heading { font-size: 21px; }
+        .stat-value { font-size: 22px; }
+        .panel { padding: 15px; }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+
+    <div>
+        <h2 class="page-heading">Dashboard Overview</h2>
+        <p class="page-subtitle">
+            Welcome to your College Management Dashboard
+        </p>
+    </div>
+
+    <form method="GET" class="filter-form">
+
+        <select name="range" id="rangeFilter" onchange="toggleCustomDates()">
+            <option value="7d" {% if selected_range == '7d' %}selected{% endif %}>Last 7 Days</option>
+            <option value="30d" {% if selected_range == '30d' %}selected{% endif %}>Last 30 Days</option>
+            <option value="6m" {% if selected_range == '6m' %}selected{% endif %}>Last 6 Months</option>
+            <option value="custom" {% if selected_range == 'custom' %}selected{% endif %}>Custom Range</option>
+        </select>
+
+        <div id="customDates" class="d-flex gap-2 flex-wrap"
+             style="display:none !important;">
+
+            <input type="date" name="start_date"
+                   value="{{ start_date|date:'Y-m-d' }}">
+
+            <input type="date" name="end_date"
+                   value="{{ end_date|date:'Y-m-d' }}">
+
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-sm">
+            Apply
+        </button>
+
+    </form>
+
+</div>
+
+
+<!-- Statistics Cards -->
+
+<div class="row g-3 mb-4">
+
+    <div class="col-12 col-sm-6 col-xl-4">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stat-title">Total Students</div>
+                    <div class="stat-value">{{ total_students }}</div>
+                </div>
+                <div class="stat-icon icon-blue">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-4">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stat-title">Total Employees</div>
+                    <div class="stat-value">{{ total_employees }}</div>
+                </div>
+                <div class="stat-icon icon-green">
+                    <i class="bi bi-person-workspace"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-4">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stat-title">Total Courses</div>
+                    <div class="stat-value">{{ total_courses }}</div>
+                </div>
+                <div class="stat-icon icon-purple">
+                    <i class="bi bi-book-half"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-6">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stat-title">Fee Collection (Selected Period)</div>
+                    <div class="stat-value">₹{{ total_collection|floatformat:2 }}</div>
+                </div>
+                <div class="stat-icon icon-orange">
+                    <i class="bi bi-wallet2"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-6">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stat-title">Pending Fees</div>
+                    <div class="stat-value">₹{{ pending_fees|floatformat:2 }}</div>
+                </div>
+                <div class="stat-icon icon-red">
+                    <i class="bi bi-exclamation-circle-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- Charts -->
+
+<div class="row g-3 mb-4">
+
+    <div class="col-12 col-lg-8">
+        <div class="panel">
+
+            <h5 class="panel-title">
+                <i class="bi bi-bar-chart-fill text-primary me-2"></i>
+                Fee Collection Analysis
+            </h5>
+
+            <div class="chart-container">
+                <canvas id="feeChart"></canvas>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-4">
+        <div class="panel">
+
+            <h5 class="panel-title">
+                <i class="bi bi-pie-chart-fill text-primary me-2"></i>
+                Attendance Overview
+            </h5>
+
+            <div class="chart-container">
+                <canvas id="attendanceChart"></canvas>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+
+<!-- Recent Payments -->
+
+<div class="panel mb-4">
+
+    <h5 class="panel-title">
+        <i class="bi bi-wallet2 text-primary me-2"></i>
+        Recent Fee Payments
+    </h5>
+
+    <div class="table-responsive">
+
+        <table class="table table-hover">
+
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Student Name</th>
+                    <th>Amount</th>
+                    <th>Payment Date</th>
+                    <th>Payment Mode</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for payment in recent_payments %}
+
+                <tr>
+                    <td>{{ payment.student.student_id }}</td>
+
+                    <td>
+                        {{ payment.student.user.get_full_name|default:payment.student.user.username }}
+                    </td>
+
+                    <td>₹{{ payment.amount|floatformat:2 }}</td>
+
+                    <td>{{ payment.payment_date|date:"d M Y" }}</td>
+
+                    <td>{{ payment.payment_mode }}</td>
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="5" class="empty-message">
+                        No fee payments found for this period.
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<!-- Recent Attendance -->
+
+<div class="panel mb-4">
+
+    <h5 class="panel-title">
+        <i class="bi bi-calendar-check-fill text-primary me-2"></i>
+        Recent Attendance Records
+    </h5>
+
+    <div class="table-responsive">
+
+        <table class="table table-hover">
+
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Student Name</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for record in recent_attendance %}
+
+                <tr>
+                    <td>{{ record.student.student_id }}</td>
+
+                    <td>
+                        {{ record.student.user.get_full_name|default:record.student.user.username }}
+                    </td>
+
+                    <td>{{ record.date|date:"d M Y" }}</td>
+
+                    <td>
+                        <span class="status-badge
+                            {% if record.status == 'Present' %}status-present
+                            {% elif record.status == 'Absent' %}status-absent
+                            {% else %}status-late{% endif %}">
+                            {{ record.status }}
+                        </span>
+                    </td>
+
+                    <td>{{ record.remarks|default:"-" }}</td>
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="5" class="empty-message">
+                        No attendance records found for this period.
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+{{ collection_labels|json_script:"collection-labels" }}
+{{ collection_values|json_script:"collection-values" }}
+{{ attendance_data|json_script:"attendance-data" }}
+
+<script>
+
+    function toggleCustomDates() {
+        const range = document.getElementById('rangeFilter').value;
+        const customDates = document.getElementById('customDates');
+
+        if (range === 'custom') {
+            customDates.style.setProperty('display', 'flex', 'important');
+        } else {
+            customDates.style.setProperty('display', 'none', 'important');
+        }
+    }
+
+    toggleCustomDates();
+
+    const labels = JSON.parse(
+        document.getElementById('collection-labels').textContent
+    );
+
+    const values = JSON.parse(
+        document.getElementById('collection-values').textContent
+    );
+
+    const attendance = JSON.parse(
+        document.getElementById('attendance-data').textContent
+    );
+
+    // Fee Collection Bar Chart
+
+    new Chart(document.getElementById('feeChart'), {
+        type: 'bar',
+
+        data: {
+            labels: labels,
+
+            datasets: [{
+                label: 'Fee Collection (₹)',
+                data: values,
+                backgroundColor: '#3157d5',
+                borderRadius: 6,
+                maxBarThickness: 45
+            }]
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+
+    // Attendance Doughnut Chart
+
+    new Chart(document.getElementById('attendanceChart'), {
+        type: 'doughnut',
+
+        data: {
+            labels: ['Present', 'Absent', 'Late'],
+
+            datasets: [{
+                data: [
+                    attendance.present,
+                    attendance.absent,
+                    attendance.late
+                ],
+
+                backgroundColor: [
+                    '#1d9b5c',
+                    '#d9534f',
+                    '#e58b25'
+                ],
+
+                borderWidth: 0
+            }]
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+</script>
+
+{% endblock %}

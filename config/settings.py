@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'timetable',
     'ai_assistant',
     'library',
+    'dashboard',
 ]
 
 MIDDLEWARE = [
