@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39,6 +38,7 @@
             padding: 25px 16px;
             background: var(--sidebar);
             color: white;
+            overflow-y: auto;
         }
 
         .brand {
@@ -166,6 +166,7 @@
         <div class="sidebar-heading">Main Menu</div>
 
         <nav>
+
             <a href="/dashboard/" class="active">
                 <i class="bi bi-grid-1x2-fill"></i>
                 Dashboard
@@ -181,10 +182,21 @@
                 Library
             </a>
 
+            <a href="/courses/">
+                <i class="bi bi-mortarboard"></i>
+                Courses
+            </a>
+
+            <a href="/subjects/">
+                <i class="bi bi-journal-bookmark"></i>
+                Subjects
+            </a>
+
             <a href="/admin/">
                 <i class="bi bi-gear-fill"></i>
                 Administration
             </a>
+
         </nav>
 
     </aside>
@@ -192,6 +204,7 @@
     <main class="main-content">
 
         <header class="topbar">
+
             <div class="topbar-title">
                 <i class="bi bi-grid-1x2-fill text-primary me-2"></i>
                 Student Management System
@@ -202,6 +215,7 @@
                 Welcome,
                 <strong class="text-dark">{{ request.user.username }}</strong>
             </div>
+
         </header>
 
         <section class="content-area">

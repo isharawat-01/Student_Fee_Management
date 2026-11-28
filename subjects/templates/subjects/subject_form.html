@@ -1,0 +1,85 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+    <div class="mb-4">
+        <h2 class="fw-bold">{{ page_title }}</h2>
+        <p class="text-muted">Enter subject details below.</p>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label class="form-label">Subject Name *</label>
+                    <input
+                        type="text"
+                        name="subject_name"
+                        class="form-control"
+                        value="{{ subject.subject_name|default:'' }}"
+                        placeholder="Enter subject name"
+                        required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Subject Code *</label>
+                    <input
+                        type="text"
+                        name="subject_code"
+                        class="form-control"
+                        value="{{ subject.subject_code|default:'' }}"
+                        placeholder="Enter subject code"
+                        required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Credits *</label>
+                    <input
+                        type="number"
+                        name="credits"
+                        class="form-control"
+                        value="{{ subject.credits|default:4 }}"
+                        min="1"
+                        placeholder="Enter credits"
+                        required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Description</label>
+                    <textarea
+                        name="description"
+                        class="form-control"
+                        rows="4"
+                        placeholder="Enter subject description">{{ subject.description|default:'' }}</textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Save Subject
+                </button>
+
+                <a href="{% url 'subject_list' %}"
+                   class="btn btn-secondary ms-2">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}
